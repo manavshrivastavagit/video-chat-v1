@@ -3,7 +3,7 @@ const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
 const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header__back");
-myVideo.muted = true;
+// myVideo.muted = true;
 
 backBtn.addEventListener("click", () => {
   document.querySelector(".main__left").style.display = "flex";
@@ -38,7 +38,7 @@ navigator.mediaDevices
     addVideoStream(myVideo, stream);
 
     peer.on("call", (call) => {
-      call.answer(stream);
+      call.answer(myVideoStream);
       const video = document.createElement("video");
       call.on("stream", (userVideoStream) => {
         addVideoStream(video, userVideoStream);
