@@ -3,7 +3,8 @@ const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
 const showChat = document.querySelector("#showChat");
 const backBtn = document.querySelector(".header__back");
-// myVideo.muted = true;
+myVideo.muted = true;
+myVideo.volume = 0;
 
 backBtn.addEventListener("click", () => {
   document.querySelector(".main__left").style.display = "flex";
