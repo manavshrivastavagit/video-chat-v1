@@ -41,10 +41,29 @@ var peer = new Peer(undefined, {
 });
 
 let myVideoStream;
+var videoDevices = [0, 0];
+var isFrontCameraAvailable = true;
+var isBackCameraAvailable = false;
+var mainCamera = "front";
+var constraints = { audio: true, video: true };
 navigator.mediaDevices
-  .getUserMedia({
-    audio: true,
-    video: true,
+  .enumerateDevices()
+  .then((devices) => {
+    var videoDeviceIndex = 0;
+    devices.forEach(function (device) {
+      console.log(
+        device.kind + ": " + device.label + " id = " + device.deviceId
+      );
+      if (device.kind == "videoinput") {
+        videoDevices[videoDeviceIndex++] = device.deviceId;
+      }
+    });
+    console.log(videoDevices);
+    if (videoDeviceIndex > 0) {
+      isBackCameraAvailable = true;
+    }
+    console.log(constraints);
+    return navigator.mediaDevices.getUserMedia({ video: constraints });
   })
   .then((stream) => {
     myVideoStream = stream;
@@ -122,32 +141,27 @@ endCall.addEventListener("click", (e) => {
 });
 
 changeCamera.addEventListener("click", (e) => {
+  if (isBackCameraAvailable) {
+    mainCamera === "back" ? "front" : "back";
+  } else {
+    mainCamera = "front";
+  }
+  console.log(videoDevices);
+  constraints = {
+    // width: { min: 1024, ideal: 1280, max: 1920 },
+    // height: { min: 776, ideal: 720, max: 1080 },
+    // audio: true,
+    // video: true,
+    deviceId: { exact: videoDevices[mainCamera === "front" ? 0 : 1] },
+  };
+  console.log(constraints);
   navigator.mediaDevices
-    .enumerateDevices()
-    .then((devices) => {
-      var videoDevices = [0, 0];
-      var videoDeviceIndex = 0;
-      devices.forEach(function (device) {
-        console.log(
-          device.kind + ": " + device.label + " id = " + device.deviceId
-        );
-        if (device.kind == "videoinput") {
-          videoDevices[videoDeviceIndex++] = device.deviceId;
-        }
-      });
-
-      var constraints = {
-        width: { min: 1024, ideal: 1280, max: 1920 },
-        height: { min: 776, ideal: 720, max: 1080 },
-        deviceId: { exact: videoDevices[videoDeviceIndex == 0 ? 1 : 0] },
-      };
-      return navigator.mediaDevices.getUserMedia({ video: constraints });
-    })
+    .getUserMedia({ video: constraints })
     .then((stream) => {
       myVideoStream = stream;
       addVideoStream(myVideo, stream);
     })
-    .catch((e) => console.error(e));
+    .catch((e) => console.log("unable to change main camera"));
 });
 
 const inviteButton = document.querySelector("#inviteButton");
