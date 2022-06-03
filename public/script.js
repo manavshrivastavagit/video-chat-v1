@@ -147,7 +147,7 @@ endCall.addEventListener("click", (e) => {
 changeCamera.addEventListener("click", (e) => {
   alert(isBackCameraAvailable);
   if (isBackCameraAvailable) {
-    mainCamera == "front" ? "back" : "front";
+    mainCamera = mainCamera == "front" ? "back" : "front";
   } else {
     mainCamera = "front";
   }
