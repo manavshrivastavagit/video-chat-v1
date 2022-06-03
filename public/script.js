@@ -145,19 +145,23 @@ endCall.addEventListener("click", (e) => {
 });
 
 changeCamera.addEventListener("click", (e) => {
+  alert(isBackCameraAvailable);
   if (isBackCameraAvailable) {
     mainCamera == "front" ? "back" : "front";
   } else {
     mainCamera = "front";
   }
+  alert(mainCamera);
   console.log(videoDevices);
   alert(videoDevices);
+  const videoDeviceIndex = mainCamera == "front" ? 0 : 1;
+  alert(videoDeviceIndex);
   constraints = {
     // width: { min: 1024, ideal: 1280, max: 1920 },
     // height: { min: 776, ideal: 720, max: 1080 },
     audio: true,
     video: true,
-    deviceId: { exact: videoDevices[mainCamera == "front" ? 0 : 1] },
+    deviceId: { exact: videoDevices[videoDeviceIndex] },
   };
   console.log(constraints);
   alert(JSON.stringify(constraints));
