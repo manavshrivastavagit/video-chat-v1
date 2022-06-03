@@ -21,8 +21,8 @@ showChat.addEventListener("click", () => {
   document.querySelector(".header__back").style.display = "block";
 });
 
-// const user = prompt("Enter your name");
-var user="user"+Math.floor(Math.random() * 100);
+const user = prompt("Enter your name","user"+Math.floor(Math.random() * 100));
+// var user="user"+Math.floor(Math.random() * 100);
 // alert(user);
 const startTime = new Date();
 elapsedTimeIntervalRef = setInterval(() => {
