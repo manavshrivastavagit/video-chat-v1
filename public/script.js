@@ -63,7 +63,7 @@ navigator.mediaDevices
     // alert(videoDevices.length);
     if (videoDevices[1] != 0) {
       isBackCameraAvailable = true;
-      alert('BackCameraAvailable');
+      alert("BackCameraAvailable");
     }
     console.log(constraints);
     alert(JSON.stringify(constraints));
@@ -72,19 +72,18 @@ navigator.mediaDevices
   .then((stream) => {
     myVideoStream = stream;
     addVideoStream(myVideo, myVideoStream);
-  });
+    peer.on("call", (call) => {
+      call.answer(myVideoStream);
+      const video = document.createElement("video");
+      call.on("stream", (userVideoStream) => {
+        addVideoStream(video, userVideoStream);
+      });
+    });
 
-peer.on("call", (call) => {
-  call.answer(myVideoStream);
-  const video = document.createElement("video");
-  call.on("stream", (userVideoStream) => {
-    addVideoStream(video, userVideoStream);
+    socket.on("user-connected", (userId) => {
+      connectToNewUser(userId, stream);
+    });
   });
-});
-
-socket.on("user-connected", (userId) => {
-  connectToNewUser(userId, stream);
-});
 
 const connectToNewUser = (userId, stream) => {
   const call = peer.call(userId, stream);
@@ -160,7 +159,7 @@ changeCamera.addEventListener("click", (e) => {
     // width: { min: 1024, ideal: 1280, max: 1920 },
     // height: { min: 776, ideal: 720, max: 1080 },
     audio: true,
-    video: {deviceId: { exact: videoDevices[videoDeviceIndex] }},
+    video: { deviceId: { exact: videoDevices[videoDeviceIndex] } },
   };
   console.log(constraints);
   alert(JSON.stringify(constraints));
