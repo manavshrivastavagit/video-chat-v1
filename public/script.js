@@ -60,8 +60,10 @@ navigator.mediaDevices
     });
     console.log(videoDevices);
     alert(videoDevices);
-    if (videoDeviceIndex > 0) {
+    // alert(videoDevices.length);
+    if (videoDevices[1] != 0) {
       isBackCameraAvailable = true;
+      alert('BackCameraAvailable');
     }
     console.log(constraints);
     alert(JSON.stringify(constraints));
@@ -144,7 +146,7 @@ endCall.addEventListener("click", (e) => {
 
 changeCamera.addEventListener("click", (e) => {
   if (isBackCameraAvailable) {
-    mainCamera === "back" ? "front" : "back";
+    mainCamera == "front" ? "back" : "front";
   } else {
     mainCamera = "front";
   }
@@ -155,7 +157,7 @@ changeCamera.addEventListener("click", (e) => {
     // height: { min: 776, ideal: 720, max: 1080 },
     audio: true,
     video: true,
-    deviceId: { exact: videoDevices[mainCamera === "front" ? 0 : 1] },
+    deviceId: { exact: videoDevices[mainCamera == "front" ? 0 : 1] },
   };
   console.log(constraints);
   alert(JSON.stringify(constraints));
