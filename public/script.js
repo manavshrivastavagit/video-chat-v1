@@ -21,7 +21,9 @@ showChat.addEventListener("click", () => {
   document.querySelector(".header__back").style.display = "block";
 });
 
-const user = prompt("Enter your name");
+// const user = prompt("Enter your name");
+var user="user"+Math.floor(Math.random() * 100);
+// alert(user);
 const startTime = new Date();
 elapsedTimeIntervalRef = setInterval(() => {
   // Compute the elapsed time & display
@@ -46,6 +48,7 @@ var isFrontCameraAvailable = true;
 var isBackCameraAvailable = false;
 var mainCamera = "front";
 var constraints = { audio: true, video: true };
+var userCall;
 navigator.mediaDevices
   .enumerateDevices()
   .then((devices) => {
@@ -59,20 +62,23 @@ navigator.mediaDevices
       }
     });
     console.log(videoDevices);
-    alert(videoDevices);
-    // alert(videoDevices.length);
+    // alert(videoDevices);
+    // // alert(videoDevices.length);
     if (videoDevices[1] != 0) {
       isBackCameraAvailable = true;
-      alert("BackCameraAvailable");
+      // alert("BackCameraAvailable");
     }
     console.log(constraints);
-    alert(JSON.stringify(constraints));
+    // alert(JSON.stringify(constraints));
     return navigator.mediaDevices.getUserMedia(constraints);
   })
   .then((stream) => {
     myVideoStream = stream;
     addVideoStream(myVideo, myVideoStream);
     peer.on("call", (call) => {
+      // alert('new user joining');
+      userCall = call;
+      console.log(userCall);
       call.answer(myVideoStream);
       const video = document.createElement("video");
       call.on("stream", (userVideoStream) => {
@@ -144,17 +150,17 @@ endCall.addEventListener("click", (e) => {
 });
 
 changeCamera.addEventListener("click", (e) => {
-  alert(isBackCameraAvailable);
+  // alert(isBackCameraAvailable);
   if (isBackCameraAvailable) {
     mainCamera = mainCamera == "front" ? "back" : "front";
   } else {
     mainCamera = "front";
   }
-  alert(mainCamera);
+  // alert(mainCamera);
   console.log(videoDevices);
-  alert(videoDevices);
+  // alert(videoDevices);
   const videoDeviceIndex = mainCamera == "front" ? 0 : 1;
-  alert(videoDeviceIndex);
+  // alert(videoDeviceIndex);
   constraints = {
     // width: { min: 1024, ideal: 1280, max: 1920 },
     // height: { min: 776, ideal: 720, max: 1080 },
@@ -162,14 +168,18 @@ changeCamera.addEventListener("click", (e) => {
     video: { deviceId: { exact: videoDevices[videoDeviceIndex] } },
   };
   console.log(constraints);
-  alert(JSON.stringify(constraints));
+  // // alert(JSON.stringify(constraints));
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then((stream) => {
       myVideoStream = stream;
-      addVideoStream(myVideo, stream);
+      addVideoStream(myVideo, myVideoStream);
+      // alert( JSON.stringify(userCall.peerConnection.getSenders()));
+      // alert(myVideoStream.getTracks());
+      userCall.peerConnection.getSenders()[0].replaceTrack(myVideoStream.getTracks());
     })
     .catch((e) => console.log("unable to change main camera"));
+   
 });
 
 const inviteButton = document.querySelector("#inviteButton");
