@@ -139,7 +139,7 @@ changeCamera.addEventListener("click", (e) => {
       var constraints = {
         width: { min: 1024, ideal: 1280, max: 1920 },
         height: { min: 776, ideal: 720, max: 1080 },
-        deviceId: { exact: videoDevices[videoDeviceIndex == 0 ? 0 : 1] },
+        deviceId: { exact: videoDevices[videoDeviceIndex == 0 ? 1 : 0] },
       };
       return navigator.mediaDevices.getUserMedia({ video: constraints });
     })
