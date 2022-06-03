@@ -63,24 +63,24 @@ navigator.mediaDevices
       isBackCameraAvailable = true;
     }
     console.log(constraints);
-    return navigator.mediaDevices.getUserMedia({ video: constraints });
+    return navigator.mediaDevices.getUserMedia(constraints);
   })
   .then((stream) => {
     myVideoStream = stream;
-    addVideoStream(myVideo, stream);
-
-    peer.on("call", (call) => {
-      call.answer(myVideoStream);
-      const video = document.createElement("video");
-      call.on("stream", (userVideoStream) => {
-        addVideoStream(video, userVideoStream);
-      });
-    });
-
-    socket.on("user-connected", (userId) => {
-      connectToNewUser(userId, stream);
-    });
+    addVideoStream(myVideo, myVideoStream);
   });
+
+peer.on("call", (call) => {
+  call.answer(myVideoStream);
+  const video = document.createElement("video");
+  call.on("stream", (userVideoStream) => {
+    addVideoStream(video, userVideoStream);
+  });
+});
+
+socket.on("user-connected", (userId) => {
+  connectToNewUser(userId, stream);
+});
 
 const connectToNewUser = (userId, stream) => {
   const call = peer.call(userId, stream);
@@ -150,13 +150,13 @@ changeCamera.addEventListener("click", (e) => {
   constraints = {
     // width: { min: 1024, ideal: 1280, max: 1920 },
     // height: { min: 776, ideal: 720, max: 1080 },
-    // audio: true,
-    // video: true,
+    audio: true,
+    video: true,
     deviceId: { exact: videoDevices[mainCamera === "front" ? 0 : 1] },
   };
   console.log(constraints);
   navigator.mediaDevices
-    .getUserMedia({ video: constraints })
+    .getUserMedia(constraints)
     .then((stream) => {
       myVideoStream = stream;
       addVideoStream(myVideo, stream);
