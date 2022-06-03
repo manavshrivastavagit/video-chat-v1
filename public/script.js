@@ -2,6 +2,7 @@ const socket = io("/");
 const videoGrid = document.getElementById("video-grid");
 const myVideo = document.createElement("video");
 const showChat = document.querySelector("#showChat");
+const showTimer = document.querySelector("#showTimer");
 const backBtn = document.querySelector(".header__back");
 myVideo.muted = true;
 myVideo.volume = 0;
@@ -21,6 +22,17 @@ showChat.addEventListener("click", () => {
 });
 
 const user = prompt("Enter your name");
+const startTime = new Date();
+elapsedTimeIntervalRef = setInterval(() => {
+  // Compute the elapsed time & display
+  showTimer.innerText = timeAndDateHandling.getElapsedTime(startTime); //pass the actual record start time
+}, 1000);
+
+// Clear interval
+// if (typeof elapsedTimeIntervalRef !== "undefined") {
+//   clearInterval(elapsedTimeIntervalRef);
+//   elapsedTimeIntervalRef = undefined;
+// }
 
 var peer = new Peer(undefined, {
   path: "/peerjs",
@@ -64,7 +76,17 @@ peer.on("open", (id) => {
 });
 
 const addVideoStream = (video, stream) => {
-  video.srcObject = stream;
+  // if (window.webkitURL) {
+  //   video.src = URL.createObjectURL(stream);
+  //   myVideoStream = stream;
+  // }
+  if (video.mozSrcObject !== undefined) {
+    video.mozSrcObject = stream;
+  } else if (video.srcObject !== undefined) {
+    video.srcObject = stream;
+  } else {
+    video.src = stream;
+  }
   video.addEventListener("loadedmetadata", () => {
     video.play();
     videoGrid.append(video);
@@ -74,6 +96,8 @@ const addVideoStream = (video, stream) => {
 let text = document.querySelector("#chat_message");
 let send = document.getElementById("send");
 let messages = document.querySelector(".messages");
+let endCall = document.getElementById("endCall");
+let changeCamera = document.getElementById("changeCamera");
 
 send.addEventListener("click", (e) => {
   if (text.value.length !== 0) {
@@ -87,6 +111,43 @@ text.addEventListener("keydown", (e) => {
     socket.emit("message", text.value);
     text.value = "";
   }
+});
+
+endCall.addEventListener("click", (e) => {
+  myVideoStream.getAudioTracks()[0].enabled = false;
+  myVideoStream.getVideoTracks()[0].enabled = false;
+  peer.disconnect();
+  // window.open(window.location.href, '_blank');
+  location.reload();
+});
+
+changeCamera.addEventListener("click", (e) => {
+  navigator.mediaDevices
+    .enumerateDevices()
+    .then((devices) => {
+      var videoDevices = [0, 0];
+      var videoDeviceIndex = 0;
+      devices.forEach(function (device) {
+        console.log(
+          device.kind + ": " + device.label + " id = " + device.deviceId
+        );
+        if (device.kind == "videoinput") {
+          videoDevices[videoDeviceIndex++] = device.deviceId;
+        }
+      });
+
+      var constraints = {
+        width: { min: 1024, ideal: 1280, max: 1920 },
+        height: { min: 776, ideal: 720, max: 1080 },
+        deviceId: { exact: videoDevices[videoDeviceIndex == 0 ? 0 : 1] },
+      };
+      return navigator.mediaDevices.getUserMedia({ video: constraints });
+    })
+    .then((stream) => {
+      myVideoStream = stream;
+      addVideoStream(myVideo, stream);
+    })
+    .catch((e) => console.error(e));
 });
 
 const inviteButton = document.querySelector("#inviteButton");

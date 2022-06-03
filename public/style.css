@@ -4,6 +4,7 @@
   --main-darklg: #1d2635;
   --main-dark: #161d29;
   --primary-color: #2f80ec;
+  --warning-color: #f01414;
   --main-light: #eeeeee;
   font-family: "Poppins", sans-serif;
 }
@@ -163,6 +164,14 @@ video {
   display: none;
 }
 
+#showTimer {
+  color: #eeeeee;
+}
+
+#endCall:hover {
+  cursor: pointer;
+}
+
 .header__back {
   display: none;
   position: absolute;
@@ -189,4 +198,6 @@ video {
   #showChat {
     display: flex;
   }
+
+  
 }
