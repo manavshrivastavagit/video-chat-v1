@@ -42,8 +42,44 @@ var peer = new Peer(undefined, {
   port: "443",
 });
 
+function replaceStream(peerConnection, mediaStream) {
+  for(sender of peerConnection.getSenders()){
+      if(sender.track.kind == "audio") {
+          if(mediaStream.getAudioTracks().length > 0){
+              sender.replaceTrack(mediaStream.getAudioTracks()[0]);
+          }
+      }
+      if(sender.track.kind == "video") {
+          if(mediaStream.getVideoTracks().length > 0){
+              sender.replaceTrack(mediaStream.getVideoTracks()[0]);
+          }
+      }
+  }
+}
+// Attach audio output device to video element using device/sink ID.
+function attachSinkId(element, sinkId) {
+  if (typeof element.sinkId !== 'undefined') {
+    element.setSinkId(sinkId)
+        .then(() => {
+          console.log(`Success, audio output device attached: ${sinkId}`);
+        })
+        .catch(error => {
+          let errorMessage = error;
+          if (error.name === 'SecurityError') {
+            errorMessage = `You need to use HTTPS for selecting audio output device: ${error}`;
+          }
+          console.error(errorMessage);
+          // Jump back to first output device in the list as it's the default.
+          // audioOutputSelect.selectedIndex = 0;
+        });
+  } else {
+    console.warn('Browser does not support output device selection.');
+  }
+}
+
 let myVideoStream;
 var videoDevices = [0, 0];
+var audioDevices = [];
 var isFrontCameraAvailable = true;
 var isBackCameraAvailable = false;
 var mainCamera = "front";
@@ -60,10 +96,16 @@ navigator.mediaDevices
       if (device.kind == "videoinput") {
         videoDevices[videoDeviceIndex++] = device.deviceId;
       }
+      if (device.kind === 'audiooutput') {
+        option = device.deviceId;
+        audioDevices.push(option);
+      }
     });
     console.log(videoDevices);
     // alert(videoDevices);
     // // alert(videoDevices.length);
+    alert(audioDevices);
+    alert(audioDevices.length);
     if (videoDevices[1] != 0) {
       isBackCameraAvailable = true;
       // alert("BackCameraAvailable");
@@ -182,24 +224,12 @@ changeCamera.addEventListener("click", (e) => {
    
 });
 
-function replaceStream(peerConnection, mediaStream) {
-  for(sender of peerConnection.getSenders()){
-      if(sender.track.kind == "audio") {
-          if(mediaStream.getAudioTracks().length > 0){
-              sender.replaceTrack(mediaStream.getAudioTracks()[0]);
-          }
-      }
-      if(sender.track.kind == "video") {
-          if(mediaStream.getVideoTracks().length > 0){
-              sender.replaceTrack(mediaStream.getVideoTracks()[0]);
-          }
-      }
-  }
-}
+
 
 const inviteButton = document.querySelector("#inviteButton");
 const muteButton = document.querySelector("#muteButton");
 const stopVideo = document.querySelector("#stopVideo");
+const changeSpeaker = document.querySelector("#changeSpeaker");
 muteButton.addEventListener("click", () => {
   const enabled = myVideoStream.getAudioTracks()[0].enabled;
   if (enabled) {
@@ -227,6 +257,27 @@ stopVideo.addEventListener("click", () => {
     html = `<i class="fas fa-video"></i>`;
     stopVideo.classList.toggle("background__red");
     stopVideo.innerHTML = html;
+  }
+});
+
+var isSpeakerOn = true;
+changeSpeaker.addEventListener("click", () => {
+  if (isSpeakerOn) {
+    isSpeakerOn = false;
+    html = `<i class="fa-solid fa-volume-xmark"></i>`;
+    changeSpeaker.classList.toggle("background__red");
+    changeSpeaker.innerHTML = html;
+    const audioDestination = audioDevices[2];
+    alert(audioDestination);
+    attachSinkId(myVideo, audioDestination);
+  } else {
+    isSpeakerOn = true;
+    html = `<i class="fa-solid fa-volume-high"></i>`;
+    changeSpeaker.classList.toggle("background__red");
+    changeSpeaker.innerHTML = html;
+    const audioDestination = audioDevices[0];
+    alert(audioDestination);
+    attachSinkId(myVideo, audioDestination);
   }
 });
 
