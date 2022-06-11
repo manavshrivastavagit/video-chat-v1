@@ -21,7 +21,7 @@ showChat.addEventListener("click", () => {
   document.querySelector(".header__back").style.display = "block";
 });
 
-const user = prompt("Enter your name","user"+Math.floor(Math.random() * 100));
+// const user = prompt("Enter your name","user"+Math.floor(Math.random() * 100));
 // var user="user"+Math.floor(Math.random() * 100);
 // alert(user);
 const startTime = new Date();
@@ -181,6 +181,21 @@ changeCamera.addEventListener("click", (e) => {
     .catch((e) => console.log("unable to change main camera"));
    
 });
+
+function replaceStream(peerConnection, mediaStream) {
+  for(sender of peerConnection.getSenders()){
+      if(sender.track.kind == "audio") {
+          if(mediaStream.getAudioTracks().length > 0){
+              sender.replaceTrack(mediaStream.getAudioTracks()[0]);
+          }
+      }
+      if(sender.track.kind == "video") {
+          if(mediaStream.getVideoTracks().length > 0){
+              sender.replaceTrack(mediaStream.getVideoTracks()[0]);
+          }
+      }
+  }
+}
 
 const inviteButton = document.querySelector("#inviteButton");
 const muteButton = document.querySelector("#muteButton");

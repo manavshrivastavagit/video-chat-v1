@@ -20,8 +20,25 @@
       <div class="header__back">
         <i class="fas fa-angle-left"></i>
       </div>
-      <h3>Video Chat v1.0.12</h2>
-        <p id="showTimer">00:00</p>
+      <h3>Video Chat v1.0.14</h3>
+      <p id="showTimer">00:00</p>
+    </div>
+    <div>
+      
+      <% if (user) { %>
+        <p style="color: aliceblue;">
+          <%= user.name || user.username || user.email %>
+        </p>
+        <script>
+           var user = "<%= user.name || user.username || user.email %>" ;
+              
+        </script>
+   <% } %>
+    </div>
+    <div>
+      <form action="/logout" method="post">
+        <button class="logout" type="submit">Sign out</button>
+      </form>
     </div>
   </div>
   <div class="main">
