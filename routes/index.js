@@ -1,6 +1,7 @@
 var express = require("express");
 var db = require("../db");
 var router = express.Router();
+const { v4: uuidv4 } = require("uuid");
 
 /* GET home page. */
 router.get(
@@ -18,9 +19,9 @@ router.get(
   }
 );
 
-// router.get("/", (req, res) => {
-//   res.redirect(`/${uuidv4()}`);
-// });
+router.get("/room", (req, res) => {
+  res.redirect(`/${uuidv4()}`);
+});
 
 router.get("/:room", (req, res) => {
   res.render("room", { roomId: req.params.room,  user: req.user });
